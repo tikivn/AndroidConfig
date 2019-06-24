@@ -16,7 +16,7 @@
 
 apply plugin: 'maven'
 apply plugin: 'signing'
-apply from 'https://raw.githubusercontent.com/tikivn/AndroidConfig/master/configuration.gradle'
+apply from: 'https://raw.githubusercontent.com/tikivn/AndroidConfig/master/configuration.gradle'
 
 version = VERSION_NAME
 group = GROUP
