@@ -1,0 +1,53 @@
+
+def getProp(key) {
+  if (System.getenv(key) != null) {
+    return System.getenv(key)
+  }
+  if (project.hasProperty(key)) {
+    return project.property(key)
+  }
+  return ""
+}
+
+def aws = [:]
+aws.accessKey = getProp('AWS_ACCESS_KEY_ID')
+aws.secretKey = getProp('AWS_SECRET_ACCESS_KEY')
+aws.bucket = "tiki-mobile"
+aws.region = "ap-southeast-1"
+aws.path = "m2"
+aws.snapshotsUrl = "s3://$aws.bucket/$aws.path/snapshots"
+aws.releasesUrl = "s3://$aws.bucket/$aws.path/releases"
+ext.aws = aws
+
+def buildConfig = [:]
+buildConfig.minSdk = project.hasProperty('minSdk') ? project.property('minSdk') : 16
+buildConfig.compileSdk = 28
+buildConfig.targetSdk = 28
+ext.buildConfig = buildConfig
+
+def versions = [:]
+versions.supportlibrary = '28.0.3'
+versions.gradle = '3.2.1'
+versions.firebase = '11.2.0'
+versions.kotlin = '1.3.31'
+versions.reactNative = '0.59.9'
+ext.versions = versions
+
+def addRepos(RepositoryHandler handler) {
+  handler.maven {
+    url "$aws.snapshotsUrl"
+    credentials(AwsCredentials) {
+      accessKey aws.accessKey
+      secretKey aws.secretKey
+    }
+  }
+  handler.maven {
+    url "$aws.releasesUrl"
+    credentials(AwsCredentials) {
+      accessKey aws.accessKey
+      secretKey aws.secretKey
+    }
+  }
+}
+
+ext.addRepos = this.&addRepos
